@@ -1,0 +1,28 @@
+# Nextflow work directory and cache
+work/
+.nextflow/
+.nextflow.log*
+.nextflow.pid
+
+# Results
+results/
+
+# Singularity image cache
+*.sif
+singularity/
+
+# Conda environments
+.conda/
+
+# Pipeline reports (generated per-run)
+pipeline_info/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

@@ -19,7 +19,7 @@ process LAI_HARVEST {
     tag "${meta.id}"
     label 'process_long'
 
-    publishDir "${params.outdir}/${meta.id}/lai", mode: 'symlink', saveAs: { fn ->
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/lai", mode: 'symlink', saveAs: { fn ->
         fn.endsWith('.harvest.scn') ? fn : null
     }
 
@@ -69,7 +69,7 @@ process LAI_DIGEST {
     tag "${meta.id}"
     label 'process_low'
 
-    publishDir "${params.outdir}/${meta.id}/lai", mode: 'symlink', saveAs: { fn ->
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/lai", mode: 'symlink', saveAs: { fn ->
         fn.endsWith('.harvest.digest.scn') ? fn : null
     }
 
@@ -107,7 +107,7 @@ process LAI_RETRIEVER {
     tag "${meta.id}"
     label 'process_high'
 
-    publishDir "${params.outdir}/${meta.id}/lai", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/lai", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta), path(harvest_scn), path(digest_scn)

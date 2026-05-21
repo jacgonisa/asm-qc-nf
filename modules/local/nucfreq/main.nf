@@ -39,7 +39,7 @@ process NUCFREQ_RUN {
 
     container 'quay.io/biocontainers/nucfreq:0.1.3--py38h1eb1b71_0'
 
-    publishDir "${params.outdir}/${meta.id}/nucfreq", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/nucfreq", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta), path(bam), path(bai)

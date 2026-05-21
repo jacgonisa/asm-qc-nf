@@ -1,12 +1,8 @@
 # asm-qc-nf
 
-Nextflow DSL2 pipeline for HiFi genome assembly and quality control.
+Nextflow DSL2 pipeline for genome assembly quality control.
 
-**Two modes:**
-- **Full** — HiFi reads → hifiasm → RagTag scaffold → all QC tools
-- **QC-only** — existing FASTA → all QC tools (skip hifiasm/RagTag)
-
-Determined per-sample from the samplesheet: provide `hifi_reads` for assembly mode, `assembly_fasta` for QC-only mode.
+The user provides **contigs** and/or **scaffolds** (already assembled); the pipeline runs all QC tools on each. Contigs and scaffolds are treated independently and outputs are labelled accordingly — no assembler is included.
 
 ---
 
@@ -30,15 +26,13 @@ nextflow run main.nf \
 | column | required | description |
 |---|---|---|
 | `sample` | yes | unique sample ID |
-| `hifi_reads` | if assembling | path to HiFi reads (fastq.gz) |
-| `pat_yak` | trio only | paternal yak DB (hifiasm trio mode) |
-| `mat_yak` | trio only | maternal yak DB (hifiasm trio mode) |
-| `assembly_fasta` | if QC-only | pre-built assembly FASTA |
-| `reference_fasta` | yes | reference genome FASTA |
+| `contigs_fasta` | one required | raw assembler contigs (hifiasm .fa) |
+| `scaffolds_fasta` | one required | reference-guided scaffolds (RagTag, etc.) |
+| `reference_fasta` | yes | reference genome for QUAST, alignment tools |
 | `meryl_db` | for Merqury | path to Meryl k-mer database (see below) |
 | `busco_lineage` | no | overrides `params.busco_lineage` per sample |
 
-At least one of `hifi_reads` or `assembly_fasta` must be provided per row.
+At least one of `contigs_fasta` or `scaffolds_fasta` must be provided. When both are given, all tools run on each independently and outputs are labelled `contigs/` or `scaffolds/` in the results directory.
 
 ---
 
@@ -175,14 +169,17 @@ Nchart repo plus an inline R plot. No R packages beyond base R are required.
 ```
 results/
 └── <sample_id>/
-    ├── hifiasm/          primary.fa, hap1.fa, hap2.fa, *.gfa
-    ├── ragtag/           *.scaffold.chr_only.fasta, ragtag_output/
-    ├── compleasm/        summary.txt, full results
-    ├── quast/            report.tsv, report.html
-    ├── merqury/          *.qv, *.completeness.stats
-    ├── lai/              *.harvest.scn, *.LAI.output
-    ├── kplexity/         *.kplex.csv
-    ├── flagger/          *.bed, full results
-    ├── nucfreq/          *.png, full results
-    └── nchart/           *.lengths, *.nchart.png
+    ├── contigs/          (present if contigs_fasta was provided)
+    │   ├── compleasm/    summary.txt
+    │   ├── quast/        report.tsv, report.html
+    │   ├── merqury/      *.qv, *.completeness.stats
+    │   ├── lai/          *.harvest.scn, *.LAI.output
+    │   ├── kplexity/     *.kplex.csv
+    │   ├── flagger/      *.bed
+    │   ├── nucfreq/      *.png
+    │   └── nchart/       *.lengths, *.nchart.png
+    └── scaffolds/        (present if scaffolds_fasta was provided)
+        ├── compleasm/
+        ├── quast/
+        └── ...           (same structure as contigs/)
 ```

@@ -38,7 +38,7 @@ process FLAGGER_RUN {
 
     conda 'flagger'
 
-    publishDir "${params.outdir}/${meta.id}/flagger", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/flagger", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta), path(bam), path(bai)

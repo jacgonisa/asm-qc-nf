@@ -6,7 +6,7 @@ process QUAST {
 
     container 'quay.io/biocontainers/quast:5.2.0--py39pl5321h2add14b_1'
 
-    publishDir "${params.outdir}/${meta.id}/quast", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/quast", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta), path(reference_fasta)

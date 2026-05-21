@@ -13,7 +13,7 @@ process KPLEXITY {
     tag "${meta.id}"
     label 'process_high'
 
-    publishDir "${params.outdir}/${meta.id}/kplexity", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/kplexity", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta)

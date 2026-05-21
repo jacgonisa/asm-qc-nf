@@ -6,7 +6,7 @@ process COMPLEASM {
 
     container 'quay.io/biocontainers/compleasm:0.2.6--pyh7cba7a3_0'
 
-    publishDir "${params.outdir}/${meta.id}/compleasm", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/compleasm", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta)

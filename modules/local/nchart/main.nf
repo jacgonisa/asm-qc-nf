@@ -15,7 +15,7 @@ process NCHART {
 
     container 'quay.io/biocontainers/r-base:4.3.1'
 
-    publishDir "${params.outdir}/${meta.id}/nchart", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/nchart", mode: 'symlink'
 
     input:
     tuple val(meta), path(assembly_fasta), path(reference_fasta)

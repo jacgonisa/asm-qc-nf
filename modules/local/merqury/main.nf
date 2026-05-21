@@ -6,7 +6,7 @@ process MERQURY {
 
     container 'quay.io/biocontainers/merqury:1.3--hdfd78af_2'
 
-    publishDir "${params.outdir}/${meta.id}/merqury", mode: 'symlink'
+    publishDir "${params.outdir}/${meta.id}/${meta.type}/merqury", mode: 'symlink'
 
     input:
     tuple val(meta), path(meryl_db), path(assembly_fasta)

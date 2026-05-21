@@ -1,4 +1,5 @@
-sample,hifi_reads,pat_yak,mat_yak,assembly_fasta,reference_fasta,meryl_db,busco_lineage
-col_parent_40x,/path/to/col_hifi_reads.fastq.gz,,,, /path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
-f1_hap1_50x,,/path/to/pat.yak,/path/to/mat.yak,,/path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
-col_parent_qc_only,,,, /path/to/assembly.fa,/path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,/path/to/ref.meryl,embryophyta_odb10
+sample,contigs_fasta,scaffolds_fasta,reference_fasta,meryl_db,busco_lineage
+col_parent_40x,/path/to/cenh3ox_col_parent.fa,/path/to/ragtag.scaffold.chr_only.fasta,/path/to/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
+col_parent_30x,/path/to/parent_30x.fa,/path/to/ragtag_30x.scaffold.chr_only.fasta,/path/to/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
+f1_hap1_50x,/path/to/f1_hap1_ctg.fa,/path/to/hap1_ragtag.scaffold.chr_only.fasta,/path/to/Col-0.ragtag_chr1-5.fa,/path/to/hap1.meryl,embryophyta_odb10
+f1_hap2_50x,/path/to/f1_hap2_ctg.fa,,/path/to/Ler-0.ragtag_chr1-5.fa,,embryophyta_odb10
