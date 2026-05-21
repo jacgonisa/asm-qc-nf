@@ -1,0 +1,4 @@
+sample,hifi_reads,pat_yak,mat_yak,assembly_fasta,reference_fasta,meryl_db,busco_lineage
+col_parent_40x,/path/to/col_hifi_reads.fastq.gz,,,, /path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
+f1_hap1_50x,,/path/to/pat.yak,/path/to/mat.yak,,/path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,,embryophyta_odb10
+col_parent_qc_only,,,, /path/to/assembly.fa,/path/to/Col-HiFi/Col-0.ragtag_chr1-5.fa,/path/to/ref.meryl,embryophyta_odb10
