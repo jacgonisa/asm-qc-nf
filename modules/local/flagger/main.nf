@@ -75,5 +75,6 @@ workflow FLAGGER {
 
     emit:
     results  = FLAGGER_RUN.out.results
+    bed      = FLAGGER_RUN.out.bed
     versions = FLAGGER_RUN.out.versions
 }

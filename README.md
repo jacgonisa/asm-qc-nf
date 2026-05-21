@@ -123,6 +123,7 @@ meryl k=21 count /path/to/cenh3ox_col_parent_40x.fastq.gz \
 | `--run_flagger` | `true` | |
 | `--run_nucfreq` | `true` | |
 | `--run_nchart` | `true` | Requires `--fastalengths_bin` + `--nchart_script` |
+| `--run_report` | `true` | Aggregate PDF report per sample × type (requires numpy, scipy, matplotlib) |
 
 ---
 
@@ -177,9 +178,30 @@ results/
     │   ├── kplexity/     *.kplex.csv
     │   ├── flagger/      *.bed
     │   ├── nucfreq/      *.png
-    │   └── nchart/       *.lengths, *.nchart.png
+    │   ├── nchart/       *.lengths, *.nchart.png
+    │   └── report/       *_qc_report.pdf
     └── scaffolds/        (present if scaffolds_fasta was provided)
         ├── compleasm/
         ├── quast/
         └── ...           (same structure as contigs/)
 ```
+
+### QC Report
+
+When `--run_report true` (default), the pipeline generates a PDF report per sample × type:
+
+**Page 1 — Summary stats table**
+
+| Section | Metrics |
+|---|---|
+| Assembly | Total length, N sequences, N50, L50 |
+| QUAST | Genome fraction, misassemblies, mismatch/indel rate |
+| Merqury | QV score, k-mer completeness |
+| BUSCO | Single, Duplicated, Fragmented, Missing % |
+| LAI | Score + quality grade (Reference ≥10, Acceptable ≥5) |
+| kplexity | Unique-k asymptote, fit R² |
+| Flagger | Per-label percentages (Hap, Collapse, Error, Duplication) |
+
+**Page 2 — kplexity curve** (only when kplexity CSV is present): observed fraction-unique-k-mers vs k-mer size, with double-sigmoid fit overlay and asymptote annotation.
+
+The report uses `bin/render_qc_report.py` (bundled in the pipeline) and requires `numpy`, `scipy`, and `matplotlib` in the execution environment.
