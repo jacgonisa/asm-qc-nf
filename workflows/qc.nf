@@ -92,14 +92,18 @@ workflow QC {
         // Base: [key, meta, assembly_fasta]
         ch_base = ch_input.map { meta, fa, ref, meryl -> [ _key(meta), meta, fa ] }
 
-        // Optional tool outputs as [key, file] — Channel.empty() when tool disabled
+        // Optional tool outputs as [key, file/dir] — Channel.empty() when tool disabled
         ch_quast_tsv   = params.run_quast     ? keyed(QUAST.out.report_tsv)            : Channel.empty()
         ch_mqv         = params.run_merqury   ? keyed(MERQURY.out.qv)                  : Channel.empty()
         ch_mqc         = params.run_merqury   ? keyed(MERQURY.out.completeness)         : Channel.empty()
+        ch_mqdir       = params.run_merqury   ? keyed(MERQURY.out.results)              : Channel.empty()
         ch_compl       = params.run_compleasm ? keyed(COMPLEASM.out.summary)            : Channel.empty()
         ch_lai         = params.run_lai       ? keyed(LAI.out.lai_output)               : Channel.empty()
         ch_kplex       = params.run_kplexity  ? keyed(KPLEXITY.out.csv)                : Channel.empty()
         ch_flagger_bed = params.run_flagger   ? keyed(FLAGGER.out.bed)                 : Channel.empty()
+        ch_nfdir       = params.run_nucfreq   ? keyed(NUCFREQ.out.results)              : Channel.empty()
+        ch_ncdir       = params.run_nchart    ? keyed(NCHART.out.plot.map { m, p -> [m, p instanceof List ? p[0] : p] })
+                                             : Channel.empty()
 
         // Join all optional outputs to the base channel.
         // remainder: true keeps base entries that have no matching tool output.
@@ -108,21 +112,27 @@ workflow QC {
             .join(ch_quast_tsv,   remainder: true)
             .join(ch_mqv,         remainder: true)
             .join(ch_mqc,         remainder: true)
+            .join(ch_mqdir,       remainder: true)
             .join(ch_compl,       remainder: true)
             .join(ch_lai,         remainder: true)
             .join(ch_kplex,       remainder: true)
             .join(ch_flagger_bed, remainder: true)
-            .map { key, meta, fa, quast, mqv, mqc, compl, lai, kplex, fla ->
+            .join(ch_nfdir,       remainder: true)
+            .join(ch_ncdir,       remainder: true)
+            .map { key, meta, fa, quast, mqv, mqc, mqdir, compl, lai, kplex, fla, nfdir, ncdir ->
                 [
                     meta,
                     fa,
                     quast  ?: no_file,
                     mqv    ?: no_file,
                     mqc    ?: no_file,
+                    mqdir  ?: no_file,
                     compl  ?: no_file,
                     lai    ?: no_file,
                     kplex  ?: no_file,
                     fla    ?: no_file,
+                    nfdir  ?: no_file,
+                    ncdir  ?: no_file,
                 ]
             }
 

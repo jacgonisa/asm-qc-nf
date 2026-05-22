@@ -33,10 +33,13 @@ def parse_args():
     p.add_argument('--quast_tsv',             default=None)
     p.add_argument('--merqury_qv',            default=None)
     p.add_argument('--merqury_completeness',  default=None)
+    p.add_argument('--merqury_dir',           default=None, help='Merqury output directory (for spectrum plots)')
     p.add_argument('--compleasm_summary',     default=None)
     p.add_argument('--lai_output',            default=None)
     p.add_argument('--kplex_csv',             default=None)
     p.add_argument('--flagger_bed',           default=None)
+    p.add_argument('--nucfreq_dir',           default=None, help='NucFreq output directory (for PNG plots)')
+    p.add_argument('--nchart_dir',            default=None, help='Nchart output directory (for PNG plot)')
     return p.parse_args()
 
 
@@ -269,6 +272,65 @@ def fit_kplexity(csv_path, n_restarts=20):
     return k_vals, y_vals, best_popt, round(asymptote, 4), round(best_r2, 4)
 
 
+# ── Image helpers ─────────────────────────────────────────────────────────────
+def collect_pngs(directory, patterns):
+    """
+    Return sorted list of PNG Paths from `directory` matching any of `patterns`
+    (fnmatch-style globs, e.g. '*.spectra-asm.fl.png').
+    """
+    import fnmatch
+    d = Path(directory)
+    if not d.is_dir():
+        return []
+    found = []
+    for p in sorted(d.rglob('*.png')):
+        if any(fnmatch.fnmatch(p.name, pat) for pat in patterns):
+            found.append(p)
+    return found
+
+
+def add_image_pages(pdf, section_title, png_paths):
+    """
+    Embed each PNG as a full-page figure in the PDF.
+    A section header page is prepended when more than one image is added.
+    """
+    if not png_paths:
+        return
+
+    # Section divider page
+    fig, ax = plt.subplots(figsize=(11, 8.5))
+    ax.axis('off')
+    ax.text(0.5, 0.55, section_title,
+            ha='center', va='center', fontsize=22, fontweight='bold',
+            transform=ax.transAxes, color='#2c3e50')
+    ax.text(0.5, 0.42, f'{len(png_paths)} plot(s)',
+            ha='center', va='center', fontsize=12,
+            transform=ax.transAxes, color='#7f8c8d')
+    fig.patch.set_facecolor('#ecf0f1')
+    pdf.savefig(fig, bbox_inches='tight')
+    plt.close(fig)
+
+    for png in png_paths:
+        try:
+            img = plt.imread(str(png))
+        except Exception as e:
+            print(f"[WARN] Could not read {png}: {e}", file=sys.stderr)
+            continue
+        h, w = img.shape[:2]
+        # Keep aspect ratio, fit on letter landscape
+        ratio = w / h
+        fig_w = min(13, max(8, ratio * 8))
+        fig_h = fig_w / ratio
+        fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+        ax.imshow(img, aspect='equal')
+        ax.axis('off')
+        ax.set_title(Path(png).stem.replace('_', ' '), fontsize=9,
+                     color='#555', pad=4)
+        fig.tight_layout(pad=0.3)
+        pdf.savefig(fig, bbox_inches='tight')
+        plt.close(fig)
+
+
 # ── PDF pages ─────────────────────────────────────────────────────────────────
 def draw_stats_page(fig, sample, asm_type, data):
     """Render a two-column key/value table of all QC metrics."""
@@ -488,6 +550,24 @@ def main():
         except Exception as e:
             print(f"[WARN] Flagger parse failed: {e}", file=sys.stderr)
 
+    # ── Collect plot images ───────────────────────────────────────────────────
+    merqury_pngs = []
+    if _is_real(args.merqury_dir):
+        # Prefer the *.fl.png (filled) variants — most informative
+        merqury_pngs = collect_pngs(args.merqury_dir,
+                                    ['*.spectra-asm.fl.png', '*.spectra-cn.fl.png'])
+        if not merqury_pngs:
+            # Fallback: any spectrum PNG
+            merqury_pngs = collect_pngs(args.merqury_dir, ['*.spectra*.png'])
+
+    nucfreq_pngs = []
+    if _is_real(args.nucfreq_dir):
+        nucfreq_pngs = collect_pngs(args.nucfreq_dir, ['*.png'])
+
+    nchart_pngs = []
+    if _is_real(args.nchart_dir):
+        nchart_pngs = collect_pngs(args.nchart_dir, ['*.png'])
+
     # ── Render PDF ────────────────────────────────────────────────────────────
     k_vals, y_vals, popt, asymptote, r2 = kplex_result
     has_kplex = k_vals is not None and len(k_vals) > 0
@@ -499,13 +579,22 @@ def main():
         pdf.savefig(fig, bbox_inches='tight')
         plt.close(fig)
 
-        # Page 2: kplexity curve (only if data present)
+        # Page 2: kplexity curve
         if has_kplex:
             fig = plt.figure(figsize=(10, 6))
             draw_kplex_page(fig, args.sample, args.asm_type,
                             k_vals, y_vals, popt, asymptote, r2)
             pdf.savefig(fig, bbox_inches='tight')
             plt.close(fig)
+
+        # Merqury spectrum plots
+        add_image_pages(pdf, f'Merqury — {args.sample} [{args.asm_type}]', merqury_pngs)
+
+        # NucFreq plots
+        add_image_pages(pdf, f'NucFreq — {args.sample} [{args.asm_type}]', nucfreq_pngs)
+
+        # Nchart plots
+        add_image_pages(pdf, f'Nchart — {args.sample} [{args.asm_type}]', nchart_pngs)
 
         d = pdf.infodict()
         d['Title'] = f'QC Report — {args.sample} [{args.asm_type}]'
