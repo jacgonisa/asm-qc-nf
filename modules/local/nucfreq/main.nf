@@ -12,7 +12,7 @@ process NUCFREQ_ALIGN {
     tag "${meta.id}"
     label 'process_high'
 
-    container 'quay.io/biocontainers/minimap2:2.28--he4a0461_0'
+    container 'quay.io/biocontainers/mulled-v2-66534bcbb7031a148b13e2ad42583020b9cd25c4:3161f532a5ea6f1dec9be5667c9efc2afdac6104-0'
 
     input:
     tuple val(meta), path(assembly_fasta), path(reference_fasta)

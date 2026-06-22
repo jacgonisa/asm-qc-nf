@@ -38,8 +38,8 @@ process NCHART {
 
     Rscript - <<'RSCRIPT'
     # Minimal inline Nchart: read lengths files, compute cumulative size, plot
-    asm_len <- sort(as.numeric(readLines("${meta.id}.assembly.lengths")), decreasing=TRUE)
-    ref_len <- sort(as.numeric(readLines("${meta.id}.reference.lengths")), decreasing=TRUE)
+    asm_len <- sort(read.table("${meta.id}.assembly.lengths", sep="\t")\$V2, decreasing=TRUE)
+    ref_len <- sort(read.table("${meta.id}.reference.lengths", sep="\t")\$V2, decreasing=TRUE)
 
     png("${meta.id}.nchart.png", width=900, height=600, res=120)
     plot(cumsum(asm_len)/1e6, type="l", col="#2980b9", lwd=2,

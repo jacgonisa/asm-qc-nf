@@ -19,6 +19,7 @@ process MERQURY {
 
     script:
     """
+    export MERQURY=/usr/local/share/merqury
     mkdir merqury_out
     cd merqury_out
     merqury.sh \\
